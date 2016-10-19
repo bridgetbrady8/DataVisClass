@@ -1,0 +1,115 @@
+---
+title: "Assignment 5"
+author: "Bridget Brady"
+date: "October 11, 2016"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(ggplot2)
+
+```
+
+
+```{r}
+library(tidyr)
+```
+
+
+```{r}
+library(dplyr)
+tallestbuildings=read.csv("tallestbuildings.csv")
+```
+
+Display how many buildings are there in each city represented in that dataset
+
+```{r}
+tallestbuildings$City=as.character(tallestbuildings$City)
+tallestbuildings$City=gsub("ÿ","",tallestbuildings$City)
+head(tallestbuildings$City)
+```
+
+
+
+```{r}
+tallestbuildings %>%group_by(City)%>%tally()%>%ggplot(.,aes(reorder(City,n),n))+geom_bar(stat="identity")+coord_flip() 
+
+
+```
+
+Mean Height as a Graph by City
+
+```{r}
+tallestbuildings$Height..ft.=as.character(tallestbuildings$Height..ft.)
+tallestbuildings$Height..ft.=gsub(",","",tallestbuildings$Height..ft.)
+tallestbuildings$Height..ft.=as.numeric(tallestbuildings$Height..ft.)
+
+tallestbuildings %>% group_by(City) %>%  summarise(Mean.Height=round(mean(Height..ft.,na.rm=TRUE),2))%>%
+    ggplot(aes(x=reorder(City,Mean.Height), y=Mean.Height)) +
+    geom_bar(stat="identity")+xlab("")+coord_flip()
+```
+
+Installed Countrycode
+
+```{r}
+#install.packages("countrycode")
+library(countrycode)
+```
+
+
+Separated Cities and Countries
+
+```{r}
+newtallestbuildings=tallestbuildings %>% separate(City,c("City","Country"), sep="[:punct:]")
+```
+
+Display how many buildings are there in each Country represented in that dataset
+
+```{r}
+newtallestbuildings %>%group_by(Country)%>%tally()%>%ggplot(.,aes(reorder(Country,n),n))+geom_bar(stat="identity")+coord_flip() 
+```
+
+Mean Height as a Graph by Country
+
+```{r}
+newtallestbuildings$Height..ft.=as.character(newtallestbuildings$Height..ft.)
+newtallestbuildings$Height..ft.=gsub(",","",newtallestbuildings$Height..ft.)
+newtallestbuildings$Height..ft.=as.numeric(newtallestbuildings$Height..ft.)
+
+newtallestbuildings %>% group_by(Country) %>%  summarise(Mean.Height=round(mean(Height..ft.,na.rm=TRUE),2))%>%
+    ggplot(aes(x=reorder(Country,Mean.Height), y=Mean.Height)) +
+    geom_bar(stat="identity")+xlab("")+coord_flip()
+```
+
+
+Color Added
+
+```{r}
+newtallestbuildings %>% group_by(Country) %>%  summarise(Mean.Height=round(mean(Height..ft.,na.rm=TRUE),2))%>%
+    ggplot(aes(color=Country, fill=Country, x=reorder(Country,Mean.Height), y=Mean.Height)) +
+    geom_bar(stat="identity")+xlab("")+coord_flip() 
+```
+
+
+Mean heights (in feet) of buildings that are used for different purposes
+
+```{r}
+tallestbuildings %>% group_by(Use) %>%  summarise(Mean.Height=round(mean(Height..ft.,na.rm=TRUE),2))%>%
+    ggplot(aes(x=reorder(Use,Mean.Height), y=Mean.Height)) +
+    geom_bar(stat="identity")+xlab("")+coord_flip()
+```
+
+
+Mean heights (in feet) of buildings that are used for different purposes in color
+
+```{r}
+tallestbuildings %>% group_by(Use) %>%  summarise(Mean.Height=round(mean(Height..ft.,na.rm=TRUE),2))%>%
+    ggplot(aes(color=Use, fill=Use, x=reorder(Use,Mean.Height), y=Mean.Height)) +
+    geom_bar(stat="identity")+xlab("")+coord_flip()
+```
+
+
